@@ -14,6 +14,13 @@ body {
   align-items: center;
 }
 
+.navbar-logo {
+  height: 90px; /* Намалява височината */
+  width: auto; /* Запазва пропорциите */
+  margin-right: 950px;
+}
+
+
 .navbar {
   display: flex;
   font-size: 1.5rem;
@@ -61,36 +68,11 @@ body {
   align-items: center;
 }
 
-.main-image {
-  height: 100vh;
-  object-fit: cover;
-}
-
-.sign-in-btn {
-  background-color: #ff927b;
-  color: white;
-  border: none;
-  padding: 15px 26px;
-  font-size: 1.8rem;
-  font-weight: bold;
-  border-radius: 40px;
-  cursor: pointer;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s;
-}
-
-.sign-in-btn:hover {
-  background-color: #ff715a;
-}
-
 .col-sm-6.position-relative {
   padding-bottom: 250px; /* Регулирай стойността според нуждите */
 }
 
 h1{
-  /*font-size: 6.5rem; /* Увеличаваме размера на заглавието
-  margin-bottom: 40px;*/
-  margin-bottom: 60px;
   color: #05322b !important;
   font-size: 6.5rem !important;
   font-weight: 500 !important;
@@ -102,19 +84,12 @@ p{
   margin-bottom: 60px;
   color: #05322b;
   font-style: italic; 
-  margin-top: 15px;
-}
-
-.sign-in-btn {
-  font-size: 1.25rem; /* Увеличаваме текста в бутона */
-  padding: 12px 24px; /* Увеличаваме самия бутон */
-  margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 105px;
 }
 
 .main-image {
   height: 90vh; /* Намаляваме височината, за да се вдигне нагоре */
-  margin-top: -225px; /* Регулирай стойността, за да местиш изображението нагоре */
+  margin-top: -320px; /* Регулирай стойността, за да местиш изображението нагоре */
 }
 
 .p {
@@ -127,78 +102,7 @@ p{
 .scroll-image {
   width: 1520px;
   height: 3243px;
-  margin-top: -177px;
-}
-
-.text-container1 {
-  position: absolute;
-  top: 650px; /* Moved up from 850px */
-  left: 100px;
-  max-width: 1000px;
-  color: #333;
-  font-size: 18px;
-  font-family: Arial, sans-serif;
-}
-
-.text-container2 {
-  position: absolute;
-  top: 750px; /* Adjusted position */
-  left: 100px;
-  max-width: 1000px;
-  color: #333;
-  font-size: 18px;
-  font-family: Arial, sans-serif;
-}
-
-.text-container3 {
-  position: absolute;
-  top: 950px; /* Adjusted position */
-  left: 100px;
-  max-width: 1000px;
-  color: #333;
-  font-size: 18px;
-  font-family: Arial, sans-serif;
-}
-
-.text-container4 {
-  position: absolute;
-  top: 1150px; /* Adjusted position */
-  left: 100px;
-  max-width: 1000px;
-  color: #333;
-  font-size: 18px;
-  font-family: Arial, sans-serif;
-}
-
-h2 {
-  display: block;
-  margin-bottom: 50px; /* Reduced from 150px */
-  background-color: #fcc1b3;
-  color: white;
-  border: none;
-  padding: 15px 26px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  border-radius: 40px;
-  font-family: 'KantumruyPro', Arial, sans-serif;
-  position: absolute;
-  left: 100px;
-}
-
-h2:first-of-type {
-  top: 850px; /* Position for first h2 */
-}
-
-h2.fw-bold {
-  top: 1050px; /* Position for second h2 */
-}
-
-p {
-  margin-top: 50px; /* Reduced from 100px */
-  line-height: 0.7;
-  font-size: 2rem;
-  font-weight: bold;
-  font-family: 'KantumruyPro', Arial, sans-serif;
+  margin-top: -140px;
 }
 
 
