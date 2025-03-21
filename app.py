@@ -20,9 +20,10 @@ class SelectedInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     angle = db.Column(db.Float, nullable=False)
 
+# Основни маршрути
 @app.route('/')
 def home():
-    return render_template('index.html', title='Home', content='Welcome to the Home Page')
+    return render_template('index.html', title='Home')
 
 @app.route('/report')
 def report():
@@ -30,12 +31,13 @@ def report():
 
 @app.route('/about-us')
 def about_us():
-    return render_template('index.html', title='About Us', content='Learn more about us on this page.')
+    return render_template('index.html', title='About Us')
 
 @app.route('/current')
 def current():
     return render_template('current.html', title='Current Posture')
 
+# API маршрути
 @app.route('/current-angle')
 def current_angle():
     data = SelectedInfo.query.first()
