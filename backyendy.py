@@ -55,7 +55,7 @@ def insert_data():
             db.session.commit()
 
             print(f"New entry: {new_angle} at {datetime.utcnow()} (UTC)")
-            time.sleep(2)
+            time.sleep(1)
 
 
 if __name__ == "__main__":
