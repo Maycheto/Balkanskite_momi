@@ -3,6 +3,8 @@ from bleak import BleakClient, BleakScanner
 import binascii
 import struct
 import math
+import numpy as np
+from scipy.spatial.transform import Rotation as R
 
 # async def scan():
 #     devices = await BleakScanner.discover()
@@ -34,7 +36,6 @@ def decode_data(raw_data):
     for i in range(len(raw_data) - 10):  
         if raw_data[i] == 0x55 and raw_data[i + 1] == 0x53:
             buffer = raw_data[i:i + 11] 
-            
             for j in range(i + 11, len(raw_data) - 10): 
                 if raw_data[j] == 0x55 and raw_data[j + 1] == 0x53:
                     return [buffer, raw_data[j:j + 11]] 
@@ -62,11 +63,22 @@ def angle_output_decode(angle_data_packet):
    
     return data
     
-def magic(data1, data2):
-    roll_raw = abs(data1[0] - data2[0])  
-    pitch_raw =  abs(data1[1] - data2[1])  
-    yaw_raw =  abs(data1[2] - data2[2])
-    return roll_raw + pitch_raw + yaw_raw
+def magic(data1, data2, degrees=True):
+    # roll_raw = abs(data1[0] - data2[0])
+    # pitch_raw =  abs(data1[1] - data2[1])
+    # yaw_raw =  abs(data1[2] - data2[2])
+    # return roll_raw + pitch_raw + yaw_raw
+    R1 = R.from_euler('xyz', data1, degrees=degrees).as_matrix()
+    R2 = R.from_euler('xyz', data2, degrees=degrees).as_matrix()
+    
+    R_rel = R1.T @ R2
+    
+    theta = np.arccos((np.trace(R_rel) - 1) / 2)
+    
+    if degrees:
+        theta = np.degrees(theta)
+    
+    return theta
 
 
 async def notification_handler(sender, data):
