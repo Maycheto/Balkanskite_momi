@@ -1,0 +1,130 @@
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('font/KantumruyPro-VariableFont_wght') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+body {
+  font-family: 'KantumruyPro', Arial, sans-serif;
+  background: linear-gradient(to bottom, #ff927b 0%, #ffedd1 53%, #72b0ab 100%);
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.navbar {
+  display: flex;
+  font-size: 1.5rem;
+  font-weight: bold;
+  justify-content: flex-end;
+  margin-left: auto;
+  margin-bottom: 60px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: #05322b;
+  font-style: italic;
+  padding: 15px 20px;
+  border-radius: 10px;
+  transition: color 0.3s, border-bottom 0.3s;
+  position: relative;
+}
+
+.navbar a:hover {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.navbar a::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #ffffff;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.navbar a:hover::after {
+  width: 100%;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.main-image {
+  height: 100vh;
+  object-fit: cover;
+}
+
+.sign-in-btn {
+  background-color: #ff927b;
+  color: white;
+  border: none;
+  padding: 15px 26px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  border-radius: 40px;
+  cursor: pointer;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+}
+
+.sign-in-btn:hover {
+  background-color: #ff715a;
+}
+
+.col-sm-6.position-relative {
+  padding-bottom: 250px; /* Регулирай стойността според нуждите */
+}
+
+h1{
+  /*font-size: 6.5rem; /* Увеличаваме размера на заглавието
+  margin-bottom: 40px;*/
+  margin-bottom: 60px;
+  color: #05322b !important;
+  font-size: 6.5rem !important;
+  font-weight: 500 !important;
+  font-style: italic; 
+}
+
+p{
+  font-size: 2rem; /* Увеличаваме подзаглавието */
+  margin-bottom: 60px;
+  color: #05322b;
+  font-style: italic; 
+  margin-top: 15px;
+}
+
+.sign-in-btn {
+  font-size: 1.25rem; /* Увеличаваме текста в бутона */
+  padding: 12px 24px; /* Увеличаваме самия бутон */
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.main-image {
+  height: 90vh; /* Намаляваме височината, за да се вдигне нагоре */
+  margin-top: -225px; /* Регулирай стойността, за да местиш изображението нагоре */
+}
+
+.p {
+  font-size: 2.9rem; /* Размер на текста */
+  font-style: italic; /* Курсивен стил */
+  color: #05322b; /* Цвят на текста */
+  font-style: italic; 
+}
+
+
+
+
+
