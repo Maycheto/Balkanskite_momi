@@ -100,7 +100,7 @@ uint8_t Calculate_Checksum(uint8_t *data, uint16_t length) {
     }
     return temp;
 }
-uint32_t count=0;
+//uint32_t count=0;
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 //
 //    if (huart->Instance == UART4) {
@@ -114,8 +114,53 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 //        memset(uart4_rx_buffer, 0, BUFF_SIZE);
 //        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, RESET);
 //    }//huart->Instance == UART5 || huart->Instance == UART7
+	if(huart->Instance == UART5){
+		HAL_UARTEx_ReceiveToIdle_DMA(&huart5, uart5_rx_buffer, BUFF_SIZE);
+		      memset(udma5_rx_buffer, 0, BUFF_SIZE);
+		      if(Size > 0){
+		       memcpy(udma5_rx_buffer, uart5_rx_buffer, Size);
+		      }
+		       __HAL_DMA_DISABLE_IT(&hdma_uart5_rx, DMA_IT_HT);
+		        rx_size5 = Size;
+		       //CDC_Transmit_FS(udma5_rx_buffer, rx_size5);
+		       //memset(uart5_rx_buffer, 0, BUFF_SIZE);
+	}
+
+//	if(huart->Instance == UART7){
+//			HAL_UARTEx_ReceiveToIdle_DMA(&huart7, uart7_rx_buffer, BUFF_SIZE);
+//			      memset(udma7_rx_buffer, 0, BUFF_SIZE);
+//			      if(Size > 0){
+//			       memcpy(udma7_rx_buffer, uart7_rx_buffer, Size);
+//			      }
+//			       __HAL_DMA_DISABLE_IT(&hdma_uart7_rx, DMA_IT_HT);
+//			        rx_size7 = Size;
+//			       //CDC_Transmit_FS(udma5_rx_buffer, rx_size5);
+//			       memset(uart7_rx_buffer, 0, BUFF_SIZE);
+//	}
 
 }
+
+
+//void transmit_ble(UART_HandleTypeDef *huart, char* message){
+//	 uint8_t *rx_buffer;
+//	 uint16_t *rx_size;
+//
+//	uint16_t size=sizeof(message);
+//	uint8_t Size=size;
+//	memcpy(rx_buffer, message, sizeof(message));
+//	*rx_size = Size;
+//	memcpy(&full_packet, header, sizeof(header));
+//
+//	full_packet[sizeof(header)]   =   (uint8_t)((*rx_size));
+//	full_packet[sizeof(header)+1] = (uint8_t)((*rx_size)<<8u);
+//	memcpy(&full_packet[sizeof(header)+sizeof(*rx_size)],  message, *rx_size);
+//
+//	 uint8_t temp = Calculate_Checksum(full_packet, HEADER_SIZE + sizeof(*rx_size) +  *rx_size );
+//	full_packet[HEADER_SIZE + sizeof(*rx_size) +  *rx_size] = temp;
+//	volatile uint8_t test= HEADER_SIZE + sizeof(*rx_size) +  *rx_size;
+//	full_packet[test+1]=0;
+//	HAL_UART_Transmit(&huart, full_packet,test+1, HAL_MAX_DELAY);
+//}
 
 /* USER CODE END 0 */
 
@@ -163,10 +208,12 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   static const uint8_t header[HEADER_SIZE] = {0x02, 0x04};  // Packet Header
+  //static const char hello[] = "hello shity uart";
+  uint32_t count = 0;
 
   while (1)
   {
-	  count++;
+	  	  count++;
 	     if (count%10000000==0) {
 	         HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
@@ -175,11 +222,11 @@ int main(void)
 	         uint16_t *rx_size;
 
 
-	         uint8_t hello[]={0x48,0x47,0x43,0x59,0x49,0x54,0};
-	         uint16_t size=sizeof(hello)-1;
+	         uint8_t* hello= uart5_rx_buffer;
+	         uint16_t size= rx_size5;
 	         uint8_t Size=size;
 	         rx_size=&size;
-	         memcpy(rx_buffer,hello,sizeof(hello)-1);
+	         memcpy(rx_buffer,hello,sizeof(hello));
 //	         HAL_UARTEx_ReceiveToIdle_DMA(huart4, rx_buffer, BUFF_SIZE);
 //	         memset(udma_buffer, 0, BUFF_SIZE);
 //	         memcpy(udma_buffer, rx_buffer, Size);
@@ -189,7 +236,7 @@ int main(void)
 	         // packet
 
 	         memcpy(&full_packet, header,sizeof(header));
-	 //        memcpy(&full_packet[sizeof(header)], rx_size, sizeof(*rx_size));
+	 //       memcpy(&full_packet[sizeof(header)], rx_size, sizeof(*rx_size));
 	         full_packet[sizeof(header)]   =   (uint8_t)((*rx_size));
 	         full_packet[sizeof(header)+1] =(uint8_t)((*rx_size)<<8u);
 	         memcpy(&full_packet[sizeof(header)+sizeof(*rx_size)],  hello, *rx_size);
@@ -205,6 +252,8 @@ int main(void)
 
 
 	         //HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, RESET);
+	    	 //transmit_ble(&huart4, hello);
+
 	     }
 
   }
