@@ -31,12 +31,16 @@ async def find_services():
 asyncio.run(find_services())
 
 def decode_data(raw_data):
-     for i in range(len(raw_data)):
-         if raw_data[i] == 0x55 and i + 10 < len(raw_data):
-             if raw_data[i + 1] == 0x53:
-                 buffer = raw_data [i:i + 11]
-                 return buffer
-    
+    for i in range(len(raw_data) - 10):  
+        if raw_data[i] == 0x55 and raw_data[i + 1] == 0x53:
+            buffer = raw_data[i:i + 11] 
+            
+            for j in range(i + 11, len(raw_data) - 10): 
+                if raw_data[j] == 0x55 and raw_data[j + 1] == 0x53:
+                    return [buffer, raw_data[j:j + 11]] 
+            
+    return []  
+
               
     
 def hex_packet(raw_data):
@@ -58,20 +62,32 @@ def angle_output_decode(angle_data_packet):
    
     return data
     
+def magic(data1, data2):
+    roll_raw = abs(data1[0] - data2[0])  
+    pitch_raw =  abs(data1[1] - data2[1])  
+    yaw_raw =  abs(data1[2] - data2[2])
+    return roll_raw + pitch_raw + yaw_raw
+
 
 async def notification_handler(sender, data):
-    print(f"Received from {sender}: {data}")
-    print(hex_packet(data))
+    # print(f"Received from {sender}: {data}")
+    # print(hex_packet(data))
     angle_packet = decode_data(data)
-    print(hex_packet(angle_packet))
+    # rint(angle_packet)
+    # print(hex_packet(data))
     # print(len(angle_packet))
     # print(angle_packet[0])
     # print(angle_packet[1])
-    hihi = angle_output_decode(angle_packet)
-    print(hihi[0])
-    print(hihi[1])
-    print(hihi[2])
-    # angle_output_decode(data)  
+    hihi = angle_output_decode(angle_packet[0])
+    hihi2 = angle_output_decode(angle_packet[1])
+    # print(hihi[0])
+    # print(hihi[1])
+    # print(hihi[2])
+    # angle_output_decode(data) 
+    print(magic(hihi, hihi2))
+
+        
+     
 
 async def subscribe():
     async with BleakClient(DEVICE_UUID) as client:
