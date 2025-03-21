@@ -7,16 +7,18 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles2.css') }}">
 
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> -->
 
-
-
-
-    
     <style>
+        body {
+            background-image: url("{{ url_for('static', filename='bbbg.png') }}"); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            background-attachment: fixed; 
+        } 
         .timeline-container {
             text-align: center;
             position: relative;
@@ -110,10 +112,13 @@
             font-weight: bold;
             margin-top: 20px;
         }
+
+
+
         .popup-notification {
             position: fixed;
-            top: 20px;
-            right: -300px; /* Започва извън екрана */
+            top: 80px;
+            right: -300px; /* Извън екрана */
             width: 250px;
             padding: 15px;
             background-color: red;
@@ -122,25 +127,69 @@
             text-align: center;
             border-radius: 5px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: right 0.5s ease-in-out;
+            transition: right 0.5s ease-in-out, opacity 0.5s ease-in-out; /* Добавяме плавно изчезване */
+            opacity: 0; /* Скрито по подразбиране */
             z-index: 1000;
         }
 
         .popup-notification.show {
-            right: 20px; /* Плъзва се навътре */
+            right: 20px; /* Влиза на екрана */
+            opacity: 1;
         }
+
+        .popup-notification.hide {
+            right: -300px; /* Излиза от екрана */
+            opacity: 0;
+        }
+
+
+
+        .navbar {
+            display: flex;
+            font-size: 1.5rem;
+            font-weight: bold;
+            justify-content: flex-end;
+            margin-left: auto;
+            margin-bottom: 60px;
+            background-color: #ff927b !important;
+            }
+
+            .navbar a {
+            text-decoration: none;
+            color: #05322b;
+            font-style: italic;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transition: color 0.3s, border-bottom 0.3s;
+            position: relative;
+            }
+
+            .navbar a:hover {
+            background-color: transparent;
+            color: #ffffff;
+            }
+
+            .navbar a::after {
+            content: "";
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #ffffff;
+            transition: width 0.3s;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            }
+
+            .navbar a:hover::after {
+            width: 100%;
+            }
     </style>
 </head>
 <body>
-
-
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="/">My App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
@@ -150,6 +199,7 @@
             </div>
         </div>
     </nav>
+
 
     <div class="container mt-4">
         <h1 class="text-center">Posture Report</h1>
@@ -254,17 +304,28 @@
         }
     }
 
+
     function showPopupNotification(angle) {
         const popup = document.getElementById("popup-notification");
+        const alertSound = document.getElementById("alert-sound"); // Дефинираме звука
+
         popup.textContent = `⚠️ Poor Posture! Angle: ${angle}°`;
         popup.classList.add("show");
+        popup.style.right = "20px"; // Показва се
 
-        alertSound.play();
+        alertSound.play(); // Сега вече е дефиниран правилно
 
         setTimeout(() => {
-            popup.classList.remove("show");
-        }, 2500); // Скрива се след 5 секунди
+            popup.style.right = "-300px"; // Скрива се
+            setTimeout(() => {
+                popup.classList.remove("show"); // Чистим класа след скриването
+            }, 500);
+        }, 2500);
     }
+
+
+
+
 
     function showNotification(angle) {
         if ("Notification" in window && Notification.permission === "granted") {
@@ -375,8 +436,6 @@
 // Обновяване на позицията всяка секунда
 setInterval(updateNowMarker, 1000);
 updateNowMarker(); // Стартираме веднага при зареждане
-
-
 
 
     </script>
