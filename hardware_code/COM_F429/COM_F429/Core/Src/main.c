@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BUFF_SIZE 64
+#define BUFF_SIZE 128
 #define HEADER_SIZE 2
 #define CRC_SIZE 1
 #define PACKET_OVERHEAD (HEADER_SIZE + CRC_SIZE)
@@ -73,6 +73,7 @@ uint16_t rx_size4 = 0;
 uint16_t rx_size5 = 0;
 uint16_t rx_size7 = 0;
 uint8_t full_packet[128] = {0};
+uint8_t full_packet2[128] = {0};
 
 uint8_t header[HEADER_SIZE] = {0x02, 0x04};
 
@@ -126,17 +127,16 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 		       //memset(uart5_rx_buffer, 0, BUFF_SIZE);
 	}
 
-//	if(huart->Instance == UART7){
-//			HAL_UARTEx_ReceiveToIdle_DMA(&huart7, uart7_rx_buffer, BUFF_SIZE);
-//			      memset(udma7_rx_buffer, 0, BUFF_SIZE);
-//			      if(Size > 0){
-//			       memcpy(udma7_rx_buffer, uart7_rx_buffer, Size);
-//			      }
-//			       __HAL_DMA_DISABLE_IT(&hdma_uart7_rx, DMA_IT_HT);
-//			        rx_size7 = Size;
-//			       //CDC_Transmit_FS(udma5_rx_buffer, rx_size5);
-//			       memset(uart7_rx_buffer, 0, BUFF_SIZE);
-//	}
+	if(huart->Instance == UART7){
+			HAL_UARTEx_ReceiveToIdle_DMA(&huart7, uart7_rx_buffer, BUFF_SIZE);
+			      memset(udma7_rx_buffer, 0, BUFF_SIZE);
+			      if(Size > 0){
+			       memcpy(udma7_rx_buffer, uart7_rx_buffer, Size);
+			      }
+			       __HAL_DMA_DISABLE_IT(&hdma_uart7_rx, DMA_IT_HT);
+			        rx_size7 = Size;
+			       //CDC_Transmit_FS(udma5_rx_buffer, rx_size5)
+	}
 
 }
 
@@ -208,55 +208,56 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   static const uint8_t header[HEADER_SIZE] = {0x02, 0x04};  // Packet Header
-  //static const char hello[] = "hello shity uart";
+
   uint32_t count = 0;
 
-  while (1)
-  {
-	  	  count++;
-	     if (count%10000000==0) {
-	         HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+  uint8_t full_packet[BUFF_SIZE];
 
-	         uint8_t *rx_buffer;
-	         uint8_t *udma_buffer;
-	         uint16_t *rx_size;
+  while (1) {
+      count++;
+      if (count % 1000000 == 0) {
+          HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
+          uint8_t rx_buffer[BUFF_SIZE];
+          uint8_t rx_buffer2[BUFF_SIZE];
 
-	         uint8_t* hello= uart5_rx_buffer;
-	         uint16_t size= rx_size5;
-	         uint8_t Size=size;
-	         rx_size=&size;
-	         memcpy(rx_buffer,hello,sizeof(hello));
-//	         HAL_UARTEx_ReceiveToIdle_DMA(huart4, rx_buffer, BUFF_SIZE);
-//	         memset(udma_buffer, 0, BUFF_SIZE);
-//	         memcpy(udma_buffer, rx_buffer, Size);
-//	         __HAL_DMA_DISABLE_IT(huart == &huart5 ? &hdma_uart5_rx : &hdma_uart7_rx, DMA_IT_HT);
-	         *rx_size = Size;
+          uint16_t rx_size = rx_size5;
+          uint16_t rx_size2 = rx_size7;
+          uint16_t total_size = rx_size + rx_size2;
 
-	         // packet
+          memcpy(rx_buffer, uart5_rx_buffer, rx_size);
+          memcpy(rx_buffer2, uart7_rx_buffer, rx_size2);
 
-	         memcpy(&full_packet, header,sizeof(header));
-	 //       memcpy(&full_packet[sizeof(header)], rx_size, sizeof(*rx_size));
-	         full_packet[sizeof(header)]   =   (uint8_t)((*rx_size));
-	         full_packet[sizeof(header)+1] =(uint8_t)((*rx_size)<<8u);
-	         memcpy(&full_packet[sizeof(header)+sizeof(*rx_size)],  hello, *rx_size);
-
-	         uint8_t temp = Calculate_Checksum(full_packet, HEADER_SIZE + sizeof(*rx_size) +  *rx_size );
-	         full_packet[HEADER_SIZE + sizeof(*rx_size) +  *rx_size] = temp;
-	         volatile uint8_t test= HEADER_SIZE + sizeof(*rx_size) +  *rx_size;
-	         full_packet[test+1]=0;
-	         HAL_UART_Transmit(&huart4, full_packet,test+1, HAL_MAX_DELAY);
-
-	         //debug
-	         //CDC_Transmit_FS(full_packet,  HEADER_SIZE + *rx_size + CRC_SIZE);
+          uint16_t index = 0;
 
 
-	         //HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, RESET);
-	    	 //transmit_ble(&huart4, hello);
+          memcpy(&full_packet[index], header, HEADER_SIZE);
+          index += HEADER_SIZE;
 
-	     }
+          // Store total data size
+          full_packet[index++] = (uint8_t)(total_size & 0xFF);
+          full_packet[index++] = (uint8_t)((total_size >> 8) & 0xFF);
 
+          // Store first sensor data
+          memcpy(&full_packet[index], rx_buffer, rx_size);
+          index += rx_size;
+
+          // Store second sensor data
+          memcpy(&full_packet[index], rx_buffer2, rx_size2);
+          index += rx_size2;
+
+          // Compute checksum
+          uint8_t checksum = Calculate_Checksum(full_packet, index);
+          full_packet[index++] = checksum;
+
+          // Null terminator (optional)
+          full_packet[index++] = 0;
+
+          // Transmit full packet
+          HAL_UART_Transmit(&huart4, full_packet, index, HAL_MAX_DELAY);
+      }
   }
+
   /* USER CODE END 3 */
 }
 
