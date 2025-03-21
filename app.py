@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# Свързване към съществуващата база данни
+# Свързване към базата данни
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posture.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -32,14 +32,16 @@ def report():
 def about_us():
     return render_template('index.html', title='About Us', content='Learn more about us on this page.')
 
+@app.route('/current')
+def current():
+    return render_template('current.html', title='Current Posture')
+
 @app.route('/current-angle')
 def current_angle():
     data = SelectedInfo.query.first()
     if data:
-        print(f"[LOG] Current angle from DB: {data.angle}")
         return jsonify({"angle": data.angle})
     else:
-        print("[ERROR] No data in SelectedInfo table!")
         return jsonify({"error": "No data available"}), 404
 
 @app.route('/today-data')
@@ -47,18 +49,15 @@ def today_data_route():
     data = AllInfo.query.order_by(AllInfo.created).all()
     
     if not data:
-        print("[ERROR] No data found in AllInfo table!")
         return jsonify([])
 
     today_data = []
     for entry in data:
         formatted_time = entry.created.strftime("%H:%M:%S")
-        slouched = entry.angle > 30  # Ако ъгълът е над 30 градуса, се брои за изгърбване
+        slouched = entry.angle > 30
         today_data.append({"time": formatted_time, "angle": entry.angle, "slouched": slouched})
-    
-    print(f"[LOG] Retrieved {len(today_data)} records from AllInfo.")
+
     return jsonify(today_data)
 
-if __name__ == '__main__':
-    print("[LOG] Starting Flask app...")
+if __name__ == '__main__':   
     app.run(debug=True)

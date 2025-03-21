@@ -6,91 +6,75 @@
     <title>Report</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        .timeline-container {
-            text-align: center;
-            position: relative;
-            margin-top: 20px;
-        }
-        .timeline {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            height: 30px;
-            background-color: #f0f0f0;
-            margin: 10px 0;
-            position: relative;
-        }
-        .time-segment {
-            height: 100%;
-            position: absolute;
-        }
-        .slouched {
+        .notification {
+            display: none;
             background-color: red;
-        }
-        .time-labels {
-            display: flex;
-            justify-content: space-between;
+            color: white;
+            padding: 15px;
+            text-align: center;
             font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .angle-display {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">My App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/report">Report</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about-us">About Us</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
     <div class="container mt-4">
-        <h1 class="text-center">Posture Report</h1>
-        <div class="timeline-container">
-            <div class="time-labels">
-                <span>00:00</span>
-                <span id="current-time">--:--:--</span>
-            </div>
-            <div class="timeline" id="timeline"></div>
-        </div>
+        <h1>Posture Report</h1>
+        <div id="notification" class="notification">Warning: Poor posture detected!</div>
+        <div class="angle-display">Current Angle: <span id="angle">--</span>°</div>
     </div>
 
-    <script>
-        async function loadTodayData() {
-            const response = await fetch('/today-data');
-            const data = await response.json();
-            const timeline = document.getElementById('timeline');
-            const totalTime = data.length;
-            
-            data.forEach((entry, index) => {
-                const segment = document.createElement('div');
-                segment.style.left = `${(index / totalTime) * 100}%`;
-                segment.style.width = `${100 / totalTime}%`;
-                if (entry.slouched) {
-                    segment.classList.add('time-segment', 'slouched');
-                }
-                timeline.appendChild(segment);
-            });
-        }
+    <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
 
-        function updateCurrentTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+    <script>
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                Notification.requestPermission();
+            }
         }
         
-        setInterval(updateCurrentTime, 1000);
-        updateCurrentTime();
-        loadTodayData();
+        function showNotification(angle) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                let notification = new Notification("Poor Posture Alert!", {
+                    body: `Your posture angle is ${angle}°. Sit up straight!`,
+                    icon: "https://cdn-icons-png.flaticon.com/512/565/565547.png"
+                });
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+            }
+        }
+        
+        function fetchCurrentAngle() {
+            fetch('/current-angle')
+                .then(response => response.json())
+                .then(data => {
+                    let angleDisplay = document.getElementById('angle');
+                    let notification = document.getElementById('notification');
+                    let alertSound = document.getElementById('alert-sound');
+                    
+                    if (data.angle !== undefined) {
+                        angleDisplay.textContent = data.angle.toFixed(2);
+                        
+                        if (data.angle > 30) {
+                            notification.style.display = 'block';
+                            alertSound.play();
+                            showNotification(data.angle);
+                        } else {
+                            notification.style.display = 'none';
+                        }
+                    }
+                });
+        }
+        
+        document.addEventListener("DOMContentLoaded", requestNotificationPermission);
+        setInterval(fetchCurrentAngle, 3000); // Обновяване на всеки 3 секунди
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
