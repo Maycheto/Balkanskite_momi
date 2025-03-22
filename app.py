@@ -35,7 +35,7 @@ def report():
 
 @app.route('/about-us')
 def about_us():
-    return render_template('index.html', title='About Us', content='Learn more about us on this page.')
+    return render_template('about_us.html', title='About Us')
 
 @app.route('/current-angle')
 def current_angle():
@@ -58,7 +58,7 @@ def today_data_route():
         return jsonify({"timeline": [], "good_posture": 100, "bad_posture": 0})
 
     total_records = len(data)  # Броим само реалните записи
-    slouched_count = sum(1 for entry in data if entry.angle > 30)
+    slouched_count = sum(1 for entry in data if (entry.angle < 85 or entry.angle > 100))
 
     # Изчисляваме процентите
     bad_posture_percentage = (slouched_count / total_records) * 100
@@ -72,7 +72,7 @@ def today_data_route():
         local_time = entry.created.replace(tzinfo=pytz.utc).astimezone(BULGARIA_TZ)
         formatted_time = local_time.strftime("%H:%M:%S")
 
-        slouched = entry.angle > 30
+        slouched = entry.angle < 85 or entry.angle > 100
 
         today_data.append({"time": formatted_time, "angle": entry.angle, "slouched": slouched})
 
