@@ -92,7 +92,7 @@ async def subscribe():
         print(f"Connected to {DEVICE_UUID}: {client.is_connected}")
         await client.start_notify(CHARACTERISTIC_UUID, notification_handler)
         print(f"Subscribed to notifications from {CHARACTERISTIC_UUID}")
-        await asyncio.sleep(60)
+        await asyncio.sleep(180)
         await client.stop_notify(CHARACTERISTIC_UUID)
         print(f"Unsubscribed from {CHARACTERISTIC_UUID}")
 
